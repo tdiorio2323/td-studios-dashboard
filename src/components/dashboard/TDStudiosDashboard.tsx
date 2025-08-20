@@ -113,12 +113,10 @@ const TDStudiosDashboard: React.FC = () => {
         setExtractedProfiles(result.profiles);
       } else {
         console.error('Processing failed:', result.error);
-        // For demo, use sample data
         setExtractedProfiles(sampleProfiles);
       }
     } catch (error) {
       console.error('Error processing images:', error);
-      // For demo, use sample data
       setExtractedProfiles(sampleProfiles);
     } finally {
       setProcessing(false);
@@ -326,32 +324,6 @@ const TDStudiosDashboard: React.FC = () => {
                       />
                     </div>
                     
-                    <select
-                      value={filterStatus}
-                      onChange={(e) => setFilterStatus(e.target.value)}
-                      className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    >
-                      <option value="all">All Status</option>
-                      <option value="completed">Completed</option>
-                      <option value="processing">Processing</option>
-                      <option value="pending">Pending</option>
-                    </select>
-                    
-                    <div className="flex border border-gray-700 rounded-lg">
-                      <button
-                        onClick={() => setViewMode('grid')}
-                        className={`p-2 ${viewMode === 'grid' ? 'bg-purple-600' : 'bg-gray-800'} rounded-l-lg`}
-                      >
-                        <Grid className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => setViewMode('list')}
-                        className={`p-2 ${viewMode === 'list' ? 'bg-purple-600' : 'bg-gray-800'} rounded-r-lg`}
-                      >
-                        <List className="w-5 h-5" />
-                      </button>
-                    </div>
-                    
                     <button
                       onClick={exportToCSV}
                       className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg font-medium flex items-center space-x-2"
@@ -362,72 +334,69 @@ const TDStudiosDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Grid View */}
-                {viewMode === 'grid' && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredProfiles.map(profile => (
-                      <div key={profile.id} className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-purple-500 transition-colors">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className={`flex items-center space-x-1 ${getStatusColor(profile.status)}`}>
-                            {getStatusIcon(profile.status)}
-                            <span className="text-sm font-medium capitalize">{profile.status}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProfiles.map(profile => (
+                    <div key={profile.id} className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-purple-500 transition-colors">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className={`flex items-center space-x-1 ${getStatusColor(profile.status)}`}>
+                          {getStatusIcon(profile.status)}
+                          <span className="text-sm font-medium capitalize">{profile.status}</span>
+                        </div>
+                        <span className="text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">
+                          {profile.platform}
+                        </span>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <h3 className="font-bold text-lg">{profile.displayName}</h3>
+                        <p className="text-purple-400 text-sm">{profile.username}</p>
+                        <p className="text-gray-400 text-sm">{profile.followers} followers</p>
+                      </div>
+                      
+                      <p className="text-sm text-gray-300 mb-4 line-clamp-2">{profile.bio}</p>
+                      
+                      <div className="space-y-2 mb-4">
+                        <p className="text-xs text-gray-400">Extracted Links:</p>
+                        {profile.extractedLinks.slice(0, 2).map((link, idx) => (
+                          <div key={idx} className="flex items-center justify-between bg-gray-700 px-3 py-2 rounded text-xs">
+                            <span className="truncate">{link.title}</span>
+                            <ExternalLink className="w-3 h-3 text-gray-400" />
                           </div>
-                          <span className="text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">
-                            {profile.platform}
-                          </span>
+                        ))}
+                        {profile.extractedLinks.length > 2 && (
+                          <p className="text-xs text-gray-400">+{profile.extractedLinks.length - 2} more</p>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs text-gray-400">Revenue</p>
+                          <p className="text-green-400 font-bold">${profile.revenue.toLocaleString()}</p>
                         </div>
-                        
-                        <div className="mb-4">
-                          <h3 className="font-bold text-lg">{profile.displayName}</h3>
-                          <p className="text-purple-400 text-sm">{profile.username}</p>
-                          <p className="text-gray-400 text-sm">{profile.followers} followers</p>
-                        </div>
-                        
-                        <p className="text-sm text-gray-300 mb-4 line-clamp-2">{profile.bio}</p>
-                        
-                        <div className="space-y-2 mb-4">
-                          <p className="text-xs text-gray-400">Extracted Links:</p>
-                          {profile.extractedLinks.slice(0, 2).map((link, idx) => (
-                            <div key={idx} className="flex items-center justify-between bg-gray-700 px-3 py-2 rounded text-xs">
-                              <span className="truncate">{link.title}</span>
-                              <ExternalLink className="w-3 h-3 text-gray-400" />
-                            </div>
-                          ))}
-                          {profile.extractedLinks.length > 2 && (
-                            <p className="text-xs text-gray-400">+{profile.extractedLinks.length - 2} more</p>
+                        <div className="flex items-center space-x-2">
+                          {profile.generatedPageUrl && (
+                            <>
+                              
+                                href={profile.generatedPageUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-purple-400 hover:text-purple-300"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </a>
+                              <button
+                                onClick={() => copyToClipboard(profile.generatedPageUrl!)}
+                                className="text-gray-400 hover:text-white"
+                              >
+                                <Copy className="w-4 h-4" />
+                              </button>
+                            </>
                           )}
                         </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-xs text-gray-400">Revenue</p>
-                            <p className="text-green-400 font-bold">${profile.revenue.toLocaleString()}</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {profile.generatedPageUrl && (
-                              <>
-                                
-                                  href={profile.generatedPageUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-purple-400 hover:text-purple-300"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </a>
-                                <button
-                                  onClick={() => copyToClipboard(profile.generatedPageUrl!)}
-                                  className="text-gray-400 hover:text-white"
-                                >
-                                  <Copy className="w-4 h-4" />
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        </div>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -484,33 +453,6 @@ const TDStudiosDashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Automation Tab */}
-        {activeTab === 'automation' && (
-          <div className="bg-gray-900/50 backdrop-blur-xl rounded-xl border border-gray-800 p-6">
-            <h2 className="text-xl font-bold mb-6">Automation Workflows</h2>
-            <div className="space-y-4">
-              {[
-                { name: 'OCR Processing Pipeline', status: 'Active', trigger: 'File Upload', actions: 3 },
-                { name: 'Link Page Generation', status: 'Active', trigger: 'Profile Extracted', actions: 5 },
-                { name: 'Revenue Tracking', status: 'Active', trigger: 'Page Visit', actions: 2 },
-                { name: 'Spreadsheet Export', status: 'Paused', trigger: 'Manual', actions: 1 }
-              ].map((workflow, index) => (
-                <div key={index} className="bg-gray-800 rounded-lg p-4 flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium">{workflow.name}</h3>
-                    <p className="text-sm text-gray-400">Trigger: {workflow.trigger} • {workflow.actions} actions</p>
-                  </div>
-                  <span className={`px-3 py-1 rounded text-sm ${
-                    workflow.status === 'Active' ? 'bg-green-600' : 'bg-yellow-600'
-                  }`}>
-                    {workflow.status}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Settings Tab */}
         {activeTab === 'settings' && (
           <div className="bg-gray-900/50 backdrop-blur-xl rounded-xl border border-gray-800 p-6">
@@ -523,28 +465,6 @@ const TDStudiosDashboard: React.FC = () => {
                     <label className="block text-sm text-gray-400 mb-1">OpenAI API Key</label>
                     <input type="password" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2" placeholder="sk-..." />
                   </div>
-                  <div>
-                    <label className="block text-sm text-gray-400 mb-1">Supabase URL</label>
-                    <input type="url" className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2" placeholder="https://..." />
-                  </div>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="font-medium mb-2">Processing Settings</h3>
-                <div className="space-y-3">
-                  <label className="flex items-center space-x-2">
-                    <input type="checkbox" className="rounded" defaultChecked />
-                    <span className="text-sm">Auto-process uploaded images</span>
-                  </label>
-                  <label className="flex items-center space-x-2">
-                    <input type="checkbox" className="rounded" defaultChecked />
-                    <span className="text-sm">Generate link pages automatically</span>
-                  </label>
-                  <label className="flex items-center space-x-2">
-                    <input type="checkbox" className="rounded" />
-                    <span className="text-sm">Enable email notifications</span>
-                  </label>
                 </div>
               </div>
             </div>
