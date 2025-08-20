@@ -3,9 +3,7 @@ const nextConfig = {
   images: {
     domains: ['your-supabase-url.com'],
   },
-  experimental: {
-    serverComponentsExternalPackages: ['sharp']
-  }
+  serverExternalPackages: ['sharp']
 }
 
 module.exports = nextConfig
